@@ -1,0 +1,797 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head><script src="https://static.readdy.ai/static/e.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Landing - Interactive Experience</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="https://animejs.com/lib/anime.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#1e40af'
+                    },
+                    borderRadius: {
+                        'none': '0px',
+                        'sm': '4px',
+                        DEFAULT: '8px',
+                        'md': '12px',
+                        'lg': '16px',
+                        'xl': '20px',
+                        '2xl': '24px',
+                        '3xl': '32px',
+                        'full': '9999px',
+                        'button': '8px'
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :where([class^="ri-"])::before {
+            content: "\f3c2";
+        }
+        
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #020617 100%);
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(59, 130, 246, 0.6);
+            border-radius: 50%;
+        }
+        
+        .pin-3d {
+            transform-style: preserve-3d;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .pin-3d:hover {
+            transform: translateY(-10px) rotateX(15deg) rotateY(5deg);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+        
+        .typewriter {
+            overflow: hidden;
+            border-right: 2px solid #3b82f6;
+            white-space: nowrap;
+            animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #3b82f6 }
+        }
+        
+        .glow-button {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glow-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .glow-button:hover::before {
+            left: 100%;
+        }
+        
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .floating {
+            animation: floating 6s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px) }
+            50% { transform: translateY(-20px) }
+        }
+        
+        .menu-overlay {
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .menu-overlay.active {
+            transform: translateX(0);
+        }
+        
+        .menu-item {
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .menu-overlay.active .menu-item {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            z-index: 1000;
+            transition: width 0.1s ease;
+        }
+        
+        .custom-checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #3b82f6;
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .custom-checkbox:checked {
+            background: #3b82f6;
+            border-color: #3b82f6;
+        }
+        
+        .custom-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .custom-switch {
+            width: 50px;
+            height: 24px;
+            background: #e5e7eb;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .custom-switch.active {
+            background: #3b82f6;
+        }
+        
+        .custom-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .custom-switch.active::after {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body class="font-sans overflow-x-hidden">
+    <div class="progress-bar"></div>
+    
+    <nav class="fixed top-0 w-full z-50 glassmorphism">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-white">Nexus</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="text-white hover:text-primary transition-colors duration-300 relative group">
+                        Home
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#features" class="text-white hover:text-primary transition-colors duration-300 relative group">
+                        Features
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#about" class="text-white hover:text-primary transition-colors duration-300 relative group">
+                        About
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#contact" class="text-white hover:text-primary transition-colors duration-300 relative group">
+                        Contact
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <button class="bg-primary hover:bg-secondary text-white px-6 py-2 !rounded-button whitespace-nowrap glow-button transition-all duration-300 hover:scale-105">
+                        Get Started
+                    </button>
+                </div>
+                
+                <button class="md:hidden text-white w-8 h-8 flex items-center justify-center" id="mobile-menu-btn">
+                    <i class="ri-menu-line ri-lg"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="menu-overlay fixed top-0 right-0 w-80 h-full bg-slate-900 z-40 md:hidden">
+            <div class="flex flex-col p-8 pt-20">
+                <button class="absolute top-6 right-6 text-white w-8 h-8 flex items-center justify-center" id="close-menu-btn">
+                    <i class="ri-close-line ri-lg"></i>
+                </button>
+                <a href="#home" class="menu-item text-white text-lg py-4 border-b border-slate-700 hover:text-primary transition-colors">Home</a>
+                <a href="#features" class="menu-item text-white text-lg py-4 border-b border-slate-700 hover:text-primary transition-colors">Features</a>
+                <a href="#about" class="menu-item text-white text-lg py-4 border-b border-slate-700 hover:text-primary transition-colors">About</a>
+                <a href="#contact" class="menu-item text-white text-lg py-4 border-b border-slate-700 hover:text-primary transition-colors">Contact</a>
+                <button class="menu-item bg-primary hover:bg-secondary text-white px-6 py-3 !rounded-button whitespace-nowrap mt-6 transition-all duration-300">
+                    Get Started
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <section id="home" class="min-h-screen gradient-bg relative overflow-hidden flex items-center">
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="particle" style="top: 20%; left: 10%;"></div>
+            <div class="particle" style="top: 60%; left: 80%;"></div>
+            <div class="particle" style="top: 30%; left: 70%;"></div>
+            <div class="particle" style="top: 80%; left: 20%;"></div>
+            <div class="particle" style="top: 40%; left: 90%;"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="text-white z-10">
+                    <h1 class="text-5xl lg:text-7xl font-bold mb-6 leading-tight">
+                        <span class="typewriter">Transform Your</span>
+                        <br>
+                        <span class="text-primary">Digital Experience</span>
+                    </h1>
+                    <p class="text-xl lg:text-2xl text-gray-300 mb-8 opacity-0" id="hero-subtitle">
+                        Discover the future of interactive design with cutting-edge animations, seamless user experiences, and innovative 3D elements that bring your vision to life.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 opacity-0" id="hero-buttons">
+                        <button class="bg-primary hover:bg-secondary text-white px-8 py-4 !rounded-button whitespace-nowrap text-lg font-semibold glow-button transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                            Explore Features
+                        </button>
+                        <button class="border-2 border-white text-white hover:bg-white hover:text-slate-900 px-8 py-4 !rounded-button whitespace-nowrap text-lg font-semibold transition-all duration-300 hover:scale-105">
+                            Watch Demo
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="relative lg:block hidden">
+                    <div class="pin-3d floating bg-gradient-to-br from-primary to-secondary p-8 rounded-2xl shadow-2xl transform rotate-3">
+                        <div class="w-12 h-12 flex items-center justify-center bg-white rounded-lg mb-4">
+                            <i class="ri-rocket-line ri-2x text-primary"></i>
+                        </div>
+                        <h3 class="text-white text-xl font-semibold mb-2">Innovation Hub</h3>
+                        <p class="text-blue-100">Cutting-edge solutions for modern challenges</p>
+                    </div>
+                    
+                    <div class="pin-3d floating bg-gradient-to-br from-purple-500 to-pink-500 p-6 rounded-xl shadow-2xl absolute top-20 right-0 transform -rotate-6" style="animation-delay: -2s;">
+                        <div class="w-10 h-10 flex items-center justify-center bg-white rounded-lg mb-3">
+                            <i class="ri-lightbulb-line ri-xl text-purple-500"></i>
+                        </div>
+                        <h4 class="text-white font-semibold">Creative Design</h4>
+                    </div>
+                    
+                    <div class="pin-3d floating bg-gradient-to-br from-green-500 to-teal-500 p-6 rounded-xl shadow-2xl absolute bottom-10 left-10 transform rotate-12" style="animation-delay: -4s;">
+                        <div class="w-10 h-10 flex items-center justify-center bg-white rounded-lg mb-3">
+                            <i class="ri-shield-check-line ri-xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-white font-semibold">Secure & Reliable</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="features" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">Powerful Features</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Experience the next generation of digital interaction with our comprehensive suite of advanced features designed for modern applications.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="pin-3d bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 scroll-reveal">
+                    <div class="w-16 h-16 flex items-center justify-center bg-primary rounded-xl mb-6">
+                        <i class="ri-palette-line ri-2x text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-gray-900 mb-4">Advanced Design System</h3>
+                    <p class="text-gray-600 mb-6">Comprehensive design tokens, components, and patterns that ensure consistency across all touchpoints while maintaining flexibility for customization.</p>
+                    <button class="text-primary font-semibold hover:text-secondary transition-colors">Learn More →</button>
+                </div>
+                
+                <div class="pin-3d bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 scroll-reveal">
+                    <div class="w-16 h-16 flex items-center justify-center bg-purple-500 rounded-xl mb-6">
+                        <i class="ri-magic-line ri-2x text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-gray-900 mb-4">Interactive Animations</h3>
+                    <p class="text-gray-600 mb-6">Smooth, performant animations powered by modern web technologies that enhance user engagement without compromising performance.</p>
+                    <button class="text-primary font-semibold hover:text-secondary transition-colors">Learn More →</button>
+                </div>
+                
+                <div class="pin-3d bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 scroll-reveal">
+                    <div class="w-16 h-16 flex items-center justify-center bg-green-500 rounded-xl mb-6">
+                        <i class="ri-smartphone-line ri-2x text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-gray-900 mb-4">Responsive Excellence</h3>
+                    <p class="text-gray-600 mb-6">Flawless adaptation across all devices and screen sizes with optimized touch interactions and gesture support for mobile experiences.</p>
+                    <button class="text-primary font-semibold hover:text-secondary transition-colors">Learn More →</button>
+                </div>
+                
+                <div class="pin-3d bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 scroll-reveal">
+                    <div class="w-16 h-16 flex items-center justify-center bg-orange-500 rounded-xl mb-6">
+                        <i class="ri-speed-line ri-2x text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-gray-900 mb-4">Performance Optimized</h3>
+                    <p class="text-gray-600 mb-6">Lightning-fast loading times and smooth 60fps animations through advanced optimization techniques and modern browser capabilities.</p>
+                    <button class="text-primary font-semibold hover:text-secondary transition-colors">Learn More →</button>
+                </div>
+                
+                <div class="pin-3d bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 scroll-reveal">
+                    <div class="w-16 h-16 flex items-center justify-center bg-red-500 rounded-xl mb-6">
+                        <i class="ri-shield-star-line ri-2x text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-gray-900 mb-4">Security First</h3>
+                    <p class="text-gray-600 mb-6">Enterprise-grade security measures with end-to-end encryption, secure authentication, and compliance with international standards.</p>
+                    <button class="text-primary font-semibold hover:text-secondary transition-colors">Learn More →</button>
+                </div>
+                
+                <div class="pin-3d bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 scroll-reveal">
+                    <div class="w-16 h-16 flex items-center justify-center bg-indigo-500 rounded-xl mb-6">
+                        <i class="ri-team-line ri-2x text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-gray-900 mb-4">Collaborative Tools</h3>
+                    <p class="text-gray-600 mb-6">Real-time collaboration features that enable teams to work together seamlessly, with version control and conflict resolution built-in.</p>
+                    <button class="text-primary font-semibold hover:text-secondary transition-colors">Learn More →</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="about" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div class="scroll-reveal">
+                    <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">Crafting Digital Excellence Since 2020</h2>
+                    <p class="text-xl text-gray-600 mb-8">We are a team of passionate designers, developers, and innovators dedicated to pushing the boundaries of what's possible in digital experiences. Our mission is to create interfaces that not only look beautiful but feel intuitive and perform flawlessly.</p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-8 h-8 flex items-center justify-center bg-primary rounded-lg flex-shrink-0 mt-1">
+                                <i class="ri-check-line text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-900 mb-2">User-Centered Design</h4>
+                                <p class="text-gray-600">Every decision we make is guided by deep user research and testing to ensure optimal experiences.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="w-8 h-8 flex items-center justify-center bg-primary rounded-lg flex-shrink-0 mt-1">
+                                <i class="ri-check-line text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-900 mb-2">Cutting-Edge Technology</h4>
+                                <p class="text-gray-600">We leverage the latest web technologies and frameworks to deliver modern, scalable solutions.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="w-8 h-8 flex items-center justify-center bg-primary rounded-lg flex-shrink-0 mt-1">
+                                <i class="ri-check-line text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-900 mb-2">Continuous Innovation</h4>
+                                <p class="text-gray-600">Our team constantly explores new possibilities in interaction design and emerging technologies.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="relative scroll-reveal">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="pin-3d bg-gradient-to-br from-primary to-secondary p-6 rounded-2xl text-white">
+                            <div class="text-3xl font-bold mb-2">500+</div>
+                            <div class="text-blue-100">Projects Completed</div>
+                        </div>
+                        <div class="pin-3d bg-gradient-to-br from-purple-500 to-pink-500 p-6 rounded-2xl text-white mt-8">
+                            <div class="text-3xl font-bold mb-2">50+</div>
+                            <div class="text-purple-100">Team Members</div>
+                        </div>
+                        <div class="pin-3d bg-gradient-to-br from-green-500 to-teal-500 p-6 rounded-2xl text-white -mt-4">
+                            <div class="text-3xl font-bold mb-2">98%</div>
+                            <div class="text-green-100">Client Satisfaction</div>
+                        </div>
+                        <div class="pin-3d bg-gradient-to-br from-orange-500 to-red-500 p-6 rounded-2xl text-white mt-4">
+                            <div class="text-3xl font-bold mb-2">24/7</div>
+                            <div class="text-orange-100">Support Available</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="contact" class="py-20 gradient-bg">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="text-4xl lg:text-5xl font-bold text-white mb-4">Let's Create Something Amazing</h2>
+                <p class="text-xl text-gray-300 max-w-2xl mx-auto">Ready to transform your digital presence? Get in touch with our team and let's discuss how we can bring your vision to life.</p>
+            </div>
+            
+            <div class="pin-3d bg-white rounded-3xl p-8 lg:p-12 shadow-2xl scroll-reveal">
+                <form class="space-y-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 !rounded-button focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 text-sm" placeholder="Enter your full name">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                            <input type="email" class="w-full px-4 py-3 border border-gray-300 !rounded-button focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 text-sm" placeholder="Enter your email">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Company</label>
+                        <input type="text" class="w-full px-4 py-3 border border-gray-300 !rounded-button focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 text-sm" placeholder="Your company name">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Project Type</label>
+                        <div class="relative">
+                            <button type="button" class="w-full px-4 py-3 border border-gray-300 !rounded-button text-left text-sm bg-white hover:bg-gray-50 transition-colors duration-300 pr-8" id="project-select">
+                                Select project type
+                            </button>
+                            <div class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center">
+                                <i class="ri-arrow-down-s-line text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Message</label>
+                        <textarea rows="5" class="w-full px-4 py-3 border border-gray-300 !rounded-button focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 resize-none text-sm" placeholder="Tell us about your project..."></textarea>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                        <input type="checkbox" id="newsletter" class="custom-checkbox">
+                        <label for="newsletter" class="text-sm text-gray-600">Subscribe to our newsletter for updates and insights</label>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm text-gray-600">Urgent project?</span>
+                            <div class="custom-switch" id="urgent-switch"></div>
+                        </div>
+                        
+                        <button type="submit" class="bg-primary hover:bg-secondary text-white px-8 py-3 !rounded-button whitespace-nowrap font-semibold glow-button transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                            Send Message
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+    <footer class="bg-slate-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">Nexus</h3>
+                    <p class="text-gray-400 mb-4">Transforming digital experiences through innovative design and cutting-edge technology.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 flex items-center justify-center bg-gray-800 rounded-lg hover:bg-primary transition-colors">
+                            <i class="ri-twitter-line"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 flex items-center justify-center bg-gray-800 rounded-lg hover:bg-primary transition-colors">
+                            <i class="ri-linkedin-line"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 flex items-center justify-center bg-gray-800 rounded-lg hover:bg-primary transition-colors">
+                            <i class="ri-github-line"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Services</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">UI/UX Design</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Web Development</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Mobile Apps</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Consulting</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Newsletter</h4>
+                    <p class="text-gray-400 mb-4">Stay updated with our latest insights and updates.</p>
+                    <div class="flex gap-2">
+                        <input type="email" placeholder="Your email" class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 !rounded-button text-sm focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <button class="bg-primary hover:bg-secondary px-4 py-2 !rounded-button whitespace-nowrap text-sm font-semibold transition-colors">
+                            Subscribe
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">© 2025 Nexus. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script id="menu-interactions">
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const closeMenuBtn = document.getElementById('close-menu-btn');
+            const menuOverlay = document.querySelector('.menu-overlay');
+            
+            mobileMenuBtn.addEventListener('click', function() {
+                menuOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            closeMenuBtn.addEventListener('click', function() {
+                menuOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (menuOverlay.classList.contains('active') && !menuOverlay.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                    menuOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+    </script>
+
+    <script id="scroll-animations">
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBar = document.querySelector('.progress-bar');
+            
+            window.addEventListener('scroll', function() {
+                const scrollTop = window.pageYOffset;
+                const docHeight = document.body.scrollHeight - window.innerHeight;
+                const scrollPercent = (scrollTop / docHeight) * 100;
+                progressBar.style.width = scrollPercent + '%';
+            });
+            
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.scroll-reveal').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+
+    <script id="hero-animations">
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                anime({
+                    targets: '#hero-subtitle',
+                    opacity: [0, 1],
+                    translateY: [30, 0],
+                    duration: 1000,
+                    easing: 'easeOutCubic',
+                    delay: 2000
+                });
+                
+                anime({
+                    targets: '#hero-buttons',
+                    opacity: [0, 1],
+                    translateY: [30, 0],
+                    duration: 1000,
+                    easing: 'easeOutCubic',
+                    delay: 2500
+                });
+            }, 500);
+            
+            anime({
+                targets: '.particle',
+                translateY: function() {
+                    return anime.random(-100, 100);
+                },
+                translateX: function() {
+                    return anime.random(-100, 100);
+                },
+                scale: function() {
+                    return anime.random(0.5, 2);
+                },
+                opacity: function() {
+                    return anime.random(0.2, 1);
+                },
+                duration: function() {
+                    return anime.random(3000, 8000);
+                },
+                direction: 'alternate',
+                loop: true,
+                easing: 'easeInOutSine'
+            });
+        });
+    </script>
+
+    <script id="form-interactions">
+        document.addEventListener('DOMContentLoaded', function() {
+            const urgentSwitch = document.getElementById('urgent-switch');
+            
+            urgentSwitch.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+            
+            const projectSelect = document.getElementById('project-select');
+            const projectOptions = ['Web Development', 'Mobile App', 'UI/UX Design', 'Consulting', 'Other'];
+            
+            projectSelect.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                if (document.querySelector('.project-dropdown')) {
+                    document.querySelector('.project-dropdown').remove();
+                    return;
+                }
+                
+                const dropdown = document.createElement('div');
+                dropdown.className = 'project-dropdown absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-button mt-1 shadow-lg z-10';
+                
+                projectOptions.forEach(option => {
+                    const item = document.createElement('button');
+                    item.type = 'button';
+                    item.className = 'w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors text-sm';
+                    item.textContent = option;
+                    item.addEventListener('click', function() {
+                        projectSelect.textContent = option;
+                        dropdown.remove();
+                    });
+                    dropdown.appendChild(item);
+                });
+                
+                projectSelect.parentElement.appendChild(dropdown);
+            });
+            
+            document.addEventListener('click', function(e) {
+                const dropdown = document.querySelector('.project-dropdown');
+                if (dropdown && !projectSelect.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.remove();
+                }
+            });
+        });
+    </script>
+
+    <script id="3d-interactions">
+        document.addEventListener('DOMContentLoaded', function() {
+            const pin3dElements = document.querySelectorAll('.pin-3d');
+            
+            pin3dElements.forEach(element => {
+                element.addEventListener('mouseenter', function() {
+                    anime({
+                        targets: this,
+                        rotateX: 15,
+                        rotateY: 5,
+                        translateY: -10,
+                        duration: 300,
+                        easing: 'easeOutCubic'
+                    });
+                });
+                
+                element.addEventListener('mouseleave', function() {
+                    anime({
+                        targets: this,
+                        rotateX: 0,
+                        rotateY: 0,
+                        translateY: 0,
+                        duration: 300,
+                        easing: 'easeOutCubic'
+                    });
+                });
+                
+                element.addEventListener('mousemove', function(e) {
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = (y - centerY) / 10;
+                    const rotateY = (centerX - x) / 10;
+                    
+                    anime({
+                        targets: this,
+                        rotateX: Math.max(-20, Math.min(20, rotateX)),
+                        rotateY: Math.max(-20, Math.min(20, rotateY)),
+                        duration: 100,
+                        easing: 'easeOutCubic'
+                    });
+                });
+            });
+        });
+    </script>
+
+<script>
+    !function (t, e) { var o, n, p, r; e.__SV || (window.posthog = e, e._i = [], e.init = function (i, s, a) { function g(t, e) { var o = e.split("."); 2 == o.length && (t = t[o[0]], e = o[1]), t[e] = function () { t.push([e].concat(Array.prototype.slice.call(arguments, 0))) } } (p = t.createElement("script")).type = "text/javascript", p.crossOrigin = "anonymous", p.async = !0, p.src = s.api_host.replace(".i.posthog.com", "-assets.i.posthog.com") + "/static/array.js", (r = t.getElementsByTagName("script")[0]).parentNode.insertBefore(p, r); var u = e; for (void 0 !== a ? u = e[a] = [] : a = "posthog", u.people = u.people || [], u.toString = function (t) { var e = "posthog"; return "posthog" !== a && (e += "." + a), t || (e += " (stub)"), e }, u.people.toString = function () { return u.toString(1) + ".people (stub)" }, o = "init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug".split(" "), n = 0; n < o.length; n++)g(u, o[n]); e._i.push([i, s, a]) }, e.__SV = 1) }(document, window.posthog || []);
+    posthog.init('phc_t9tkQZJiyi2ps9zUYm8TDsL6qXo4YmZx0Ot5rBlAlEd', {
+        api_host: 'https://us.i.posthog.com',
+        autocapture: false,
+        capture_pageview: false,
+        capture_pageleave: false,
+        capture_performance: {
+            web_vitals: false,
+        },
+        rageclick: false,
+    })
+    window.shareKey = 'z7wMFLog67nN1vQbnohdPQ';
+    window.host = 'readdy.ai';
+</script>
+</body>
+</html>
